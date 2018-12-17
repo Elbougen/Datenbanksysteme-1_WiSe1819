@@ -31,12 +31,11 @@ ORDER BY pnr
 
 /* g) ---------------------------------------- */
 SELECT pnr, name, vorname
-FROM personen P
-WHERE name != 'Steffen' AND 
+FROM personen
+WHERE name != 'Steffen' AND lohnstufe > 4 AND
         (
-            lohnstufe > 4 OR
             fnr = (SELECT fnr FROM funktionen WHERE funktion = 'Meister') OR
-            fnr = (SELECT fnr FROM funktionen WHERE funktion = 'Meister')
+            fnr = (SELECT fnr FROM funktionen WHERE funktion = 'Chemiker')
         )
 ORDER BY pnr
         
@@ -69,8 +68,26 @@ HAVING COUNT(knr)>1
 ORDER BY pnr
 
 /* l) ---------------------------------------- */
+SELECT knr, kursbezeichnung
+FROM kurse join kursbesuche using(knr)
+WHERE pnr IN (SELECT pnr FROM personen WHERE name = 'Steffen' AND vorname = 'Felix')
+ORDER BY knr
+
+SELECT knr, kursbezeichnung
+FROM kurse join kursbesuche using(knr) join personen using(pnr)
+WHERE name = 'Steffen' AND vorname = 'Felix'
+ORDER BY knr
 
 /* m) ---------------------------------------- */
+SELECT pnr, fnr
+FROM personen 
+WHERE (lohnstufe, fnr) IN (SELECT MAX(lohnstufe), fnr FROM personen GROUP BY fnr)
+ORDER BY fnr
+
+SELECT pnr, fnr
+FROM personen p1
+WHERE lohnstufe IN (SELECT MAX(lohnstufe) FROM personen p2 WHERE p1.fnr = p2.fnr)
+ORDER BY fnr
 
 /* 3. ---------------------------------------- */
 SELECT pnr, name, vorname, COUNT(knr)
